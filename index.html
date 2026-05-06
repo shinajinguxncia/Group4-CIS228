@@ -66,43 +66,6 @@
     <p>Reminder: Your feelings are valid. Take things one step at a time.</p>
   </footer>
 
-  <script>
-    function saveTextEntry() {
-      const title = document.getElementById("entryTitle").value;
-      const text = document.getElementById("entryText").value;
-      const entriesList = document.getElementById("entriesList");
-
-      if (title === "" || text === "") {
-        alert("Please enter a title and journal content.");
-        return;
-      }
-
-      entriesList.innerHTML += `
-        <div class="entry">
-          <h3>${title}</h3>
-          <p>${text}</p>
-        </div>
-      `;
-
-      document.getElementById("entryTitle").value = "";
-      document.getElementById("entryText").value = "";
-    }
-
-    function startRecording() {
-      document.getElementById("recordingStatus").innerText =
-        "Recording status: Recording...";
-    }
-
-    function stopRecording() {
-      document.getElementById("recordingStatus").innerText =
-        "Recording status: Recording saved.";
-    }
-
-    function clearMaskOff() {
-      document.getElementById("maskOffText").value = "";
-      alert("Your thoughts were released safely.");
-    }
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
