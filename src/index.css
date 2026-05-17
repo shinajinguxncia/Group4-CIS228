@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+
+@layer base {
+  body {
+    background-color: rgb(249 250 251);
+    color: rgb(17 24 39);
+  }
+  
+  .dark body {
+    background-color: rgb(17 24 39);
+    color: rgb(249 250 251);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
