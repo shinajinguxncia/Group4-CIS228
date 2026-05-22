@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Mic, Square, Check, Trash2 } from 'lucide-react';
-import { moodEmojis, type Mood } from '../../../types/journal';
+import {
+  cognitiveDistortions,
+  feelingSummaries,
+  JOURNAL_ENTRIES_KEY,
+  moodEmojis,
+  type JournalEntry,
+  type Mood,
+} from '../../../types/journal';
 
 const moods: Mood[] = ['happy', 'calm', 'grateful', 'anxious', 'sad', 'angry', 'confused', 'hopeful', 'tired', 'neutral'];
 
@@ -11,13 +18,15 @@ export function NewEntryPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
+  const [feelingSummary, setFeelingSummary] = useState('');
+  const [cognitiveDistortion, setCognitiveDistortion] = useState('');
+  const [reframe, setReframe] = useState('');
   const [showMoodPicker, setShowMoodPicker] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
-  
-  let durationInterval: NodeJS.Timeout;
+  const durationIntervalRef = useRef<number | null>(null);
 
   const startRecording = async () => {
     try {
@@ -37,7 +46,7 @@ export function NewEntryPage() {
       setIsRecording(true);
       
       let duration = 0;
-      durationInterval = setInterval(() => {
+      durationIntervalRef.current = window.setInterval(() => {
         duration++;
         setRecordingDuration(duration);
       }, 1000);
@@ -51,7 +60,9 @@ export function NewEntryPage() {
       mediaRecorder.stop();
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
-      clearInterval(durationInterval);
+      if (durationIntervalRef.current !== null) {
+        clearInterval(durationIntervalRef.current);
+      }
     }
   };
 
@@ -70,18 +81,37 @@ export function NewEntryPage() {
   };
 
   const handleSave = () => {
-    console.log({ title, content, mood: selectedMood, audioURL });
+    const stored = localStorage.getItem(JOURNAL_ENTRIES_KEY);
+    const existingEntries = stored ? (JSON.parse(stored) as JournalEntry[]) : [];
+    const now = new Date().toISOString();
+    const entry: JournalEntry = {
+      id: crypto.randomUUID?.() ?? `${Date.now()}`,
+      user_id: 'local',
+      title: title.trim() || 'Untitled entry',
+      content: content.trim(),
+      mood: selectedMood,
+      voice_url: audioURL,
+      voice_duration: audioURL ? recordingDuration : null,
+      is_mask_off: false,
+      feeling_summary: feelingSummary,
+      cognitive_distortion: cognitiveDistortion,
+      reframe: reframe.trim(),
+      created_at: now,
+      updated_at: now,
+    };
+
+    localStorage.setItem(JOURNAL_ENTRIES_KEY, JSON.stringify([entry, ...existingEntries]));
     navigate('/');
   };
 
   return (
-    <div>
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10">
+    <div className="font-maskoff">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md dark:border-slate-700 border-b border-gray-100 sticky top-0 z-10">
         <div className="px-4 py-4 flex items-center justify-between">
-          <button onClick={() => navigate('/')} className="p-2 hover:bg-purple-50 rounded-full">
+          <button onClick={() => navigate('/')} className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/50 rounded-full">
             <ArrowLeft className="w-5 h-5 text-purple-600" />
           </button>
-          <h2 className="font-serif text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h2 className="font-cute-display text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             New Entry
           </h2>
           <button onClick={handleSave} className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm font-medium shadow-md">
@@ -96,13 +126,13 @@ export function NewEntryPage() {
           placeholder="Title (optional)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full text-xl font-serif bg-transparent border-b-2 border-purple-200 py-2 focus:outline-none focus:border-purple-500"
+          className="font-cute-display w-full text-xl bg-transparent border-b-2 border-purple-200 py-2 focus:outline-none focus:border-purple-500 dark:text-slate-100"
         />
 
         <div>
           <button
             onClick={() => setShowMoodPicker(!showMoodPicker)}
-            className="w-full p-3 bg-white rounded-xl border border-purple-100 shadow-sm"
+            className="w-full p-3 bg-white dark:bg-slate-800 rounded-xl border border-purple-100 dark:border-purple-700 shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -121,7 +151,7 @@ export function NewEntryPage() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mt-2 p-3 bg-white rounded-xl shadow-lg border border-purple-100 grid grid-cols-5 gap-1"
+                className="mt-2 p-3 bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:border-purple-700 border border-purple-100 grid grid-cols-5 gap-1"
               >
                 {moods.map((mood) => (
                   <button
@@ -140,12 +170,50 @@ export function NewEntryPage() {
           </AnimatePresence>
         </div>
 
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-200">How are you feeling?</span>
+            <select
+              value={feelingSummary}
+              onChange={(event) => setFeelingSummary(event.target.value)}
+              className="w-full rounded-xl border border-purple-100 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
+            >
+              <option value="">Choose a prompt...</option>
+              {feelingSummaries.map((summary) => (
+                <option key={summary} value={summary}>{summary}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-200">Cognitive distortion</span>
+            <select
+              value={cognitiveDistortion}
+              onChange={(event) => setCognitiveDistortion(event.target.value)}
+              className="w-full rounded-xl border border-purple-100 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
+            >
+              <option value="">Optional...</option>
+              {cognitiveDistortions.map((distortion) => (
+                <option key={distortion} value={distortion}>{distortion}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <textarea
+          placeholder="Reframe this thought (optional)..."
+          value={reframe}
+          onChange={(e) => setReframe(e.target.value)}
+          rows={3}
+          className="w-full resize-none rounded-xl border border-purple-100 bg-white p-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
+        />
+
         <textarea
           placeholder="Write your thoughts here..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={6}
-          className="w-full p-4 bg-white rounded-xl border border-purple-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+          className="w-full p-4 bg-white dark:bg-slate-800 dark:text-slate-100 rounded-xl border border-purple-100 dark:border-purple-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
         />
 
         <div className="flex flex-col items-center justify-center py-12">
@@ -188,11 +256,11 @@ export function NewEntryPage() {
             </div>
           ) : (
             <div className="text-center w-full max-w-md">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-purple-100">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-purple-100 dark:border-purple-700">
                 <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Check className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Voice note captured</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">Voice note captured</p>
                 <audio src={audioURL} controls className="w-full mt-3 rounded-lg" />
                 <button onClick={deleteRecording} className="mt-4 px-4 py-2 text-red-500 text-sm hover:bg-red-50 rounded-full transition-colors inline-flex items-center gap-1">
                   <Trash2 className="w-3 h-3" />

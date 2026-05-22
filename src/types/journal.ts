@@ -11,9 +11,34 @@ export interface JournalEntry {
   voice_url: string | null;
   voice_duration: number | null;
   is_mask_off: boolean;
+  feeling_summary?: string;
+  cognitive_distortion?: string;
+  reframe?: string;
   created_at: string;
   updated_at: string;
 }
+
+export const JOURNAL_ENTRIES_KEY = 'journal_entries';
+
+export const feelingSummaries = [
+  'Overthinking everything',
+  'Anxious but trying',
+  'Grateful for a small win',
+  'Feeling overwhelmed',
+  'Processing a conflict',
+  'Just getting this out',
+];
+
+export const cognitiveDistortions = [
+  'All-or-nothing thinking',
+  'Catastrophizing',
+  'Mind reading',
+  'Fortune telling',
+  'Personalization',
+  'Should statements',
+  'Emotional reasoning',
+  'Not sure yet',
+];
 
 export const moodEmojis: Record<Mood, string> = {
   happy: '😊',
