@@ -16,7 +16,7 @@ export function FloatingThemeMenu({ selectedTheme, isOpen, onToggle, onChange }:
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
-        className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass}`}
+        className={`smooth-press inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass}`}
       >
         <Palette className="h-4 w-4" aria-hidden="true" />
         <span>{selectedTheme.name}</span>
@@ -28,8 +28,8 @@ export function FloatingThemeMenu({ selectedTheme, isOpen, onToggle, onChange }:
             initial={{ opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 8, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className={`absolute right-0 top-full z-30 w-72 rounded-3xl border p-3 ${selectedTheme.panelClass}`}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className={`smooth-card absolute right-0 top-full z-30 w-72 rounded-3xl border p-3 ${selectedTheme.panelClass}`}
           >
             <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[0.18em] opacity-70">Choose atmosphere</p>
             <div className="space-y-2" role="radiogroup" aria-label="Mask-Off background theme">
@@ -40,7 +40,7 @@ export function FloatingThemeMenu({ selectedTheme, isOpen, onToggle, onChange }:
                   role="radio"
                   aria-checked={selectedTheme.id === theme.id}
                   onClick={() => onChange(theme)}
-                  className="flex w-full items-center gap-3 rounded-2xl p-2 text-left transition hover:bg-white/20"
+                  className="smooth-press flex w-full items-center gap-3 rounded-2xl p-2 text-left transition hover:bg-white/20"
                 >
                   <span className={`h-12 w-12 shrink-0 rounded-2xl border ${themePreviewClass[theme.id]}`} aria-hidden="true" />
                   <span className="min-w-0 flex-1">

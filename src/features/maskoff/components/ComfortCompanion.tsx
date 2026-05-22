@@ -30,7 +30,7 @@ export function ComfortCompanion({ theme }: ComfortCompanionProps) {
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
-            className={`max-w-52 rounded-2xl border px-4 py-3 text-sm ${theme.panelClass}`}
+            className={`smooth-card max-w-52 rounded-2xl border px-4 py-3 text-sm ${theme.panelClass}`}
           >
             {message}
           </motion.div>
@@ -42,7 +42,7 @@ export function ComfortCompanion({ theme }: ComfortCompanionProps) {
         animate={{ y: [0, -4, 0] }}
         transition={{ y: { duration: 3, repeat: Infinity, ease: 'easeInOut' } }}
         onClick={showRandomMessage}
-        className={`relative h-16 w-16 rounded-full border shadow-lg ${theme.panelClass}`}
+        className={`smooth-press relative h-16 w-16 rounded-full border shadow-lg ${theme.panelClass}`}
         aria-label="Show a comforting message"
       >
         <span className="absolute left-1/2 top-6 h-7 w-10 -translate-x-1/2 rounded-full bg-white/90 shadow-inner" aria-hidden="true" />

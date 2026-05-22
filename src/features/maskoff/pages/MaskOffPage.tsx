@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FileText, Home, Lock, Moon, Plus, Search, ShieldCheck, Sun } from 'lucide-react';
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '../../../context/theme';
 import { ComfortCompanion } from '../components/ComfortCompanion';
 import { FloatingThemeMenu } from '../components/FloatingThemeMenu';
 import { PrivacyBadge } from '../components/PrivacyBadge';
@@ -19,31 +20,20 @@ import {
 export function MaskOffPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const locationState = location.state as { fromEntry?: boolean } | null;
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(Boolean(locationState?.fromEntry));
   const [pin, setPin] = useState('');
-  const [savedPin, setSavedPin] = useState<string | null>(null);
+  const [savedPin, setSavedPin] = useState<string | null>(() => localStorage.getItem(MASK_OFF_PIN_KEY));
   const [selectedTheme, setSelectedTheme] = useState<MaskOffTheme>(() => getMaskOffTheme(localStorage.getItem(MASK_OFF_THEME_KEY)));
-  const [entries, setEntries] = useState<MaskOffEntry[]>([]);
+  const [entries] = useState<MaskOffEntry[]>(() => {
+    const storedEntries = localStorage.getItem(MASK_OFF_ENTRIES_KEY);
+    return storedEntries ? (JSON.parse(storedEntries) as MaskOffEntry[]) : [];
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [isHidden, setIsHidden] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (location.state?.fromEntry) {
-      setIsUnlocked(true);
-    }
-  }, [location.state]);
-
-  useEffect(() => {
-    setSavedPin(localStorage.getItem(MASK_OFF_PIN_KEY));
-
-    const storedEntries = localStorage.getItem(MASK_OFF_ENTRIES_KEY);
-    if (storedEntries) {
-      setEntries(JSON.parse(storedEntries) as MaskOffEntry[]);
-    }
-  }, []);
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase();
@@ -88,7 +78,7 @@ export function MaskOffPage() {
     return (
       <div className={`min-h-screen ${selectedTheme.pageClass}`}>
         <div className="relative z-10 flex min-h-screen items-center justify-center p-6">
-          <div className={`w-full max-w-sm rounded-3xl border p-6 text-center ${selectedTheme.panelClass}`}>
+          <div className={`smooth-card w-full max-w-sm rounded-3xl border p-6 text-center ${selectedTheme.panelClass}`}>
             <ShieldCheck className="mx-auto mb-4 h-14 w-14 opacity-80" aria-hidden="true" />
             <h1 className="font-cute-display text-2xl">{savedPin ? 'Unlock Mask-Off' : 'Create Your PIN'}</h1>
             <p className={`mt-2 text-sm ${selectedTheme.mutedTextClass}`}>
@@ -101,20 +91,20 @@ export function MaskOffPage() {
               value={pin}
               onChange={(event) => setPin(event.target.value)}
               placeholder="Enter PIN"
-              className="mt-6 w-full rounded-2xl border border-white/40 bg-white/70 p-3 text-center text-2xl tracking-[0.35em] text-slate-950 outline-none focus:ring-2 focus:ring-current"
+              className="smooth-field mt-6 w-full rounded-2xl border border-white/40 bg-white/70 p-3 text-center text-2xl tracking-[0.35em] text-slate-950 outline-none focus:ring-2 focus:ring-current"
               aria-label="Mask-Off PIN"
             />
             <button
               type="button"
               onClick={savedPin ? handleUnlock : handleSetPin}
-              className={`mt-4 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.accentClass}`}
+              className={`smooth-press mt-4 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.accentClass}`}
             >
               {savedPin ? 'Unlock' : 'Set PIN'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/')}
-              className={`mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
+              className={`smooth-press mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
             >
               Back to Home
             </button>
@@ -134,7 +124,7 @@ export function MaskOffPage() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
+            className={`smooth-press inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
           >
             <Home className="h-4 w-4" aria-hidden="true" />
             Home
@@ -146,7 +136,7 @@ export function MaskOffPage() {
               role="switch"
               aria-checked={isDark}
               onClick={toggleTheme}
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
+              className={`smooth-press inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
               aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
             >
               <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isDark ? 'bg-slate-950/80' : 'bg-white/70'}`}>
@@ -165,7 +155,7 @@ export function MaskOffPage() {
             <button
               type="button"
               onClick={() => setIsUnlocked(false)}
-              className={`rounded-full border p-3 transition hover:scale-[1.03] ${selectedTheme.panelClass}`}
+              className={`smooth-press rounded-full border p-3 transition hover:scale-[1.03] ${selectedTheme.panelClass}`}
               aria-label="Lock Mask-Off Journal"
             >
               <Lock className="h-5 w-5" aria-hidden="true" />
@@ -189,7 +179,7 @@ export function MaskOffPage() {
             <button
               type="button"
               onClick={() => navigate('/new-maskoff', { state: { themeId: selectedTheme.id, fromMaskOff: true } })}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold shadow-sm transition hover:scale-[1.01] ${selectedTheme.accentClass}`}
+              className={`smooth-press inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold shadow-sm transition hover:scale-[1.01] ${selectedTheme.accentClass}`}
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               New Mask-Off Entry
@@ -203,11 +193,11 @@ export function MaskOffPage() {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search private entries..."
-              className={`w-full rounded-2xl border py-3 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-current ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
+              className={`smooth-field w-full rounded-2xl border py-3 pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-current ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
             />
           </div>
 
-          <section className={`rounded-3xl border p-5 ${selectedTheme.panelClass}`}>
+          <section className={`smooth-card rounded-3xl border p-5 ${selectedTheme.panelClass}`}>
             <div className="mb-3 flex items-center gap-2">
               <FileText className="h-4 w-4" aria-hidden="true" />
               <h2 className="text-sm font-semibold">Recent private entries</h2>
@@ -216,12 +206,19 @@ export function MaskOffPage() {
               <div className="space-y-3">
                 {filteredEntries.map((entry) => {
                   const mood = maskOffMoods.find((item) => item.id === entry.mood);
+                  const previewText = entry.content || entry.summary || 'No written content yet.';
                   return (
-                    <button
+                    <motion.button
                       key={entry.id}
                       type="button"
+                      layout
+                      initial={{ opacity: 0, y: 10, scale: 0.985 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      whileHover={{ y: -3, scale: 1.01 }}
+                      whileTap={{ scale: 0.985, y: 0 }}
+                      transition={{ type: 'spring', stiffness: 360, damping: 28 }}
                       onClick={() => navigate(`/maskoff-detail/${entry.id}`, { state: { themeId: selectedTheme.id } })}
-                      className={`w-full text-left rounded-xl border p-3 transition hover:scale-[1.01] ${selectedTheme.borderClass}`}
+                      className={`smooth-card w-full text-left rounded-xl border p-3 transition ${selectedTheme.borderClass}`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <h3 className="font-cute-display text-lg">{entry.title || 'Untitled truth'}</h3>
@@ -229,16 +226,21 @@ export function MaskOffPage() {
                           {new Date(entry.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className={`mt-1 line-clamp-2 text-sm ${selectedTheme.mutedTextClass}`}>
-                        {entry.content || entry.summary || 'No written content yet.'}
+                      <p className={`mt-1 line-clamp-2 text-sm ${selectedTheme.mutedTextClass} ${entry.blurContent ? 'maskoff-entry-blur' : ''}`}>
+                        {previewText}
                       </p>
+                      {entry.blurContent && (
+                        <p className={`mt-1 text-xs font-semibold ${selectedTheme.mutedTextClass}`}>
+                          Blurred after save
+                        </p>
+                      )}
                       <div className="mt-3 flex flex-wrap gap-2 text-xs">
                         {mood && <span className={`rounded-full px-2 py-1 ${selectedTheme.accentClass}`}>{mood.emoji} {mood.label}</span>}
                         <span className={`rounded-full border px-2 py-1 ${selectedTheme.borderClass}`}>Intensity {entry.intensity}/10</span>
                         {entry.summary && <span className={`rounded-full border px-2 py-1 ${selectedTheme.borderClass}`}>{entry.summary}</span>}
                         {entry.cognitiveDistortion && <span className={`rounded-full border px-2 py-1 ${selectedTheme.borderClass}`}>{entry.cognitiveDistortion}</span>}
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>

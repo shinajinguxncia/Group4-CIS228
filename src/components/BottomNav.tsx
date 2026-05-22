@@ -5,15 +5,16 @@ export function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isMaskOffActive = location.pathname.includes('maskoff');
+  const isHomeActive = !isMaskOffActive;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-lg border-t border-gray-100 dark:border-slate-800 py-2 px-6 z-50">
-      <div className="flex justify-around items-center max-w-sm mx-auto">
+    <nav className="fixed bottom-3 left-3 right-3 z-50 rounded-3xl border border-white/70 bg-white/92 px-4 py-2 shadow-2xl shadow-slate-900/10 backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-950/92">
+      <div className="mx-auto flex max-w-sm items-center justify-around">
         <button
           onClick={() => navigate('/')}
-          className={`flex flex-col items-center gap-1 py-2 px-4 rounded-full transition-all
-            ${isActive('/') ? 'text-purple-600' : 'text-gray-400 dark:text-slate-500 hover:text-purple-400'}`}
+          className={`smooth-press flex flex-col items-center gap-1 rounded-full px-4 py-2 transition-all duration-300
+            ${isHomeActive ? 'bg-purple-50 text-purple-600 shadow-sm dark:bg-purple-950/50' : 'text-gray-400 dark:text-slate-500 hover:bg-purple-50/70 hover:text-purple-400 dark:hover:bg-purple-950/30'}`}
         >
           <Home className="w-5 h-5" />
           <span className="text-xs">Home</span>
@@ -21,13 +22,13 @@ export function BottomNav() {
 
         <button
           onClick={() => navigate('/maskoff')}
-          className={`flex flex-col items-center gap-1 py-2 px-4 rounded-full transition-all
-            ${isActive('/maskoff') ? 'text-purple-600' : 'text-gray-400 dark:text-slate-500 hover:text-purple-400'}`}
+          className={`smooth-press flex flex-col items-center gap-1 rounded-full px-4 py-2 transition-all duration-300
+            ${isMaskOffActive ? 'bg-purple-50 text-purple-600 shadow-sm dark:bg-purple-950/50' : 'text-gray-400 dark:text-slate-500 hover:bg-purple-50/70 hover:text-purple-400 dark:hover:bg-purple-950/30'}`}
         >
           <Shield className="w-5 h-5" />
           <span className="text-xs">Mask-Off</span>
         </button>
       </div>
-    </div>
+    </nav>
   );
 }

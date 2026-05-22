@@ -4,15 +4,85 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
+  :root {
+    --motion-soft: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: rgb(249 250 251);
     color: rgb(17 24 39);
     font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    text-rendering: geometricPrecision;
   }
   
   .dark body {
     background-color: rgb(17 24 39);
     color: rgb(249 250 251);
+  }
+
+  button,
+  [role='button'],
+  a,
+  input,
+  textarea,
+  select {
+    transition-duration: 220ms;
+    transition-timing-function: var(--motion-soft);
+  }
+
+  button,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+
+  input,
+  textarea,
+  select {
+    transition-property: background-color, border-color, box-shadow, color, filter, transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    button:not(:disabled):not(.fixed),
+    [role='button']:not(:disabled):not(.fixed) {
+      will-change: transform;
+    }
+
+    button:not(:disabled):not(.fixed):hover,
+    [role='button']:not(:disabled):not(.fixed):hover {
+      transform: translateY(-1px);
+    }
+
+    button:not(:disabled):not(.fixed):active,
+    [role='button']:not(:disabled):not(.fixed):active {
+      transform: translateY(0) scale(0.975);
+      transition-duration: 90ms;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      transform: translateY(-1px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -31,6 +101,35 @@
   .font-maskoff {
     font-family: "Nunito", ui-rounded, "SF Pro Rounded", "Aptos", "Segoe UI", system-ui, sans-serif;
     letter-spacing: 0;
+  }
+
+  .smooth-card {
+    transition-property: background-color, border-color, box-shadow, color, filter, opacity, transform;
+    transition-duration: 260ms;
+    transition-timing-function: var(--motion-soft);
+    will-change: transform;
+  }
+
+  .smooth-card:hover {
+    box-shadow: 0 18px 45px rgb(15 23 42 / 0.10);
+    transform: translateY(-2px);
+  }
+
+  .smooth-press {
+    transition-property: background-color, border-color, box-shadow, color, filter, opacity, transform;
+    transition-duration: 220ms;
+    transition-timing-function: var(--motion-spring);
+  }
+
+  .smooth-press:active {
+    transform: scale(0.975);
+    transition-duration: 90ms;
+  }
+
+  .smooth-field {
+    transition-property: background-color, border-color, box-shadow, color, filter, transform;
+    transition-duration: 220ms;
+    transition-timing-function: var(--motion-soft);
   }
 
   .maskoff-bg-nature {
@@ -377,6 +476,12 @@
 
   .maskoff-private-blur {
     filter: blur(14px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .maskoff-entry-blur {
+    filter: blur(8px);
     pointer-events: none;
     user-select: none;
   }

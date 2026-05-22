@@ -23,6 +23,7 @@ export interface MaskOffEntry {
   id: string;
   title: string;
   content: string;
+  blurContent?: boolean;
   mood: string | null;
   intensity: number;
   summary: string;

@@ -9,7 +9,7 @@ interface SummarySelectProps {
 
 export function SummarySelect({ value, onChange, theme }: SummarySelectProps) {
   return (
-    <section className={`rounded-2xl border p-4 ${theme.panelClass}`}>
+    <section className={`smooth-card rounded-2xl border p-4 ${theme.panelClass}`}>
       <label htmlFor="maskoff-summary" className="block text-sm font-semibold">
         How I feel
       </label>
@@ -19,7 +19,7 @@ export function SummarySelect({ value, onChange, theme }: SummarySelectProps) {
           id="maskoff-summary"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className={`w-full appearance-none rounded-xl border bg-white/70 px-3 py-3 pr-10 text-sm text-slate-950 outline-none transition focus:ring-2 focus:ring-current ${theme.borderClass}`}
+          className={`smooth-field w-full appearance-none rounded-xl border bg-white/70 px-3 py-3 pr-10 text-sm text-slate-950 outline-none transition focus:ring-2 focus:ring-current ${theme.borderClass}`}
         >
           <option value="">Choose a quick summary...</option>
           {maskOffSummaries.map((summary) => (

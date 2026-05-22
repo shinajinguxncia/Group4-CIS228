@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mic, Square, Check, Trash2 } from 'lucide-react';
+import { ArrowLeft, Mic, Square, Trash2 } from 'lucide-react';
 import {
   cognitiveDistortions,
   feelingSummaries,
@@ -50,7 +50,7 @@ export function NewEntryPage() {
         duration++;
         setRecordingDuration(duration);
       }, 1000);
-    } catch (error) {
+    } catch {
       alert('Please allow microphone access');
     }
   };
@@ -108,13 +108,13 @@ export function NewEntryPage() {
     <div className="font-maskoff">
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md dark:border-slate-700 border-b border-gray-100 sticky top-0 z-10">
         <div className="px-4 py-4 flex items-center justify-between">
-          <button onClick={() => navigate('/')} className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/50 rounded-full">
+          <button onClick={() => navigate('/')} className="smooth-press p-2 hover:bg-purple-50 dark:hover:bg-purple-900/50 rounded-full">
             <ArrowLeft className="w-5 h-5 text-purple-600" />
           </button>
           <h2 className="font-cute-display text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             New Entry
           </h2>
-          <button onClick={handleSave} className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm font-medium shadow-md">
+          <button onClick={handleSave} className="smooth-press px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm font-medium shadow-md hover:shadow-lg hover:shadow-purple-500/25">
             Save
           </button>
         </div>
@@ -126,13 +126,47 @@ export function NewEntryPage() {
           placeholder="Title (optional)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="font-cute-display w-full text-xl bg-transparent border-b-2 border-purple-200 py-2 focus:outline-none focus:border-purple-500 dark:text-slate-100"
+          className="smooth-field font-cute-display w-full text-xl bg-transparent border-b-2 border-purple-200 py-2 focus:outline-none focus:border-purple-500 dark:text-slate-100"
         />
+
+        <section className="smooth-card rounded-2xl border border-purple-100 bg-white p-3 shadow-sm dark:border-purple-700 dark:bg-slate-800">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={isRecording ? stopRecording : startRecording}
+              className="smooth-press relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/20"
+              aria-label={isRecording ? 'Stop recording voice note' : 'Record optional voice note'}
+            >
+              {isRecording && <span className="absolute inset-0 rounded-full bg-red-300/40 animate-ping" aria-hidden="true" />}
+              {isRecording ? <Square className="relative h-5 w-5 fill-current" aria-hidden="true" /> : <Mic className="relative h-6 w-6" aria-hidden="true" />}
+            </button>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-semibold text-gray-800 dark:text-slate-100">Voice note</p>
+                <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[0.68rem] font-semibold uppercase text-purple-600 dark:bg-purple-950/60 dark:text-purple-200">Optional</span>
+              </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
+                {isRecording ? `${formatDuration(recordingDuration)} - tap to stop` : audioURL ? `Captured ${formatDuration(recordingDuration)}` : 'Tap to record a quick thought.'}
+              </p>
+              {audioURL && <audio src={audioURL} controls className="mt-3 w-full" />}
+            </div>
+            {audioURL && (
+              <button
+                type="button"
+                onClick={deleteRecording}
+                className="smooth-press rounded-full p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40"
+                aria-label="Delete voice note"
+              >
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+        </section>
 
         <div>
           <button
             onClick={() => setShowMoodPicker(!showMoodPicker)}
-            className="w-full p-3 bg-white dark:bg-slate-800 rounded-xl border border-purple-100 dark:border-purple-700 shadow-sm"
+            className="smooth-card w-full p-3 bg-white dark:bg-slate-800 rounded-xl border border-purple-100 dark:border-purple-700 shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -157,8 +191,8 @@ export function NewEntryPage() {
                   <button
                     key={mood}
                     onClick={() => { setSelectedMood(mood); setShowMoodPicker(false); }}
-                    className={`p-2 rounded-lg text-center transition-all ${
-                      selectedMood === mood ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' : 'hover:bg-purple-50'
+                    className={`smooth-press p-2 rounded-lg text-center transition-all ${
+                      selectedMood === mood ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm' : 'hover:bg-purple-50 hover:shadow-sm'
                     }`}
                   >
                     <div className="text-xl">{moodEmojis[mood]}</div>
@@ -176,7 +210,7 @@ export function NewEntryPage() {
             <select
               value={feelingSummary}
               onChange={(event) => setFeelingSummary(event.target.value)}
-              className="w-full rounded-xl border border-purple-100 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
+              className="smooth-field w-full rounded-xl border border-purple-100 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="">Choose a prompt...</option>
               {feelingSummaries.map((summary) => (
@@ -190,7 +224,7 @@ export function NewEntryPage() {
             <select
               value={cognitiveDistortion}
               onChange={(event) => setCognitiveDistortion(event.target.value)}
-              className="w-full rounded-xl border border-purple-100 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
+              className="smooth-field w-full rounded-xl border border-purple-100 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
             >
               <option value="">Optional...</option>
               {cognitiveDistortions.map((distortion) => (
@@ -205,7 +239,7 @@ export function NewEntryPage() {
           value={reframe}
           onChange={(e) => setReframe(e.target.value)}
           rows={3}
-          className="w-full resize-none rounded-xl border border-purple-100 bg-white p-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
+          className="smooth-field w-full resize-none rounded-xl border border-purple-100 bg-white p-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 dark:border-purple-700 dark:bg-slate-800 dark:text-slate-100"
         />
 
         <textarea
@@ -213,63 +247,8 @@ export function NewEntryPage() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={6}
-          className="w-full p-4 bg-white dark:bg-slate-800 dark:text-slate-100 rounded-xl border border-purple-100 dark:border-purple-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+          className="smooth-field w-full p-4 bg-white dark:bg-slate-800 dark:text-slate-100 rounded-xl border border-purple-100 dark:border-purple-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
         />
-
-        <div className="flex flex-col items-center justify-center py-12">
-          {!audioURL ? (
-            <div className="text-center">
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className="relative group"
-              >
-                {isRecording && (
-                  <>
-                    <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="absolute inset-0 rounded-full bg-red-200/50" />
-                    <motion.div animate={{ scale: [1, 1.5, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 0.5 }} className="absolute inset-0 rounded-full bg-red-100/30" />
-                  </>
-                )}
-                <div className={`w-32 h-32 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
-                  isRecording ? 'bg-gradient-to-br from-rose-500 to-red-500' : 'bg-gradient-to-r from-purple-600 to-pink-600'
-                }`}>
-                  {isRecording ? <Square className="w-10 h-10 text-white fill-white" /> : <Mic className="w-14 h-14 text-white" />}
-                </div>
-              </button>
-
-              <div className="mt-6 text-center">
-                {isRecording ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium text-red-500">Recording</span>
-                    </div>
-                    <p className="text-2xl font-mono font-light text-gray-600">{formatDuration(recordingDuration)}</p>
-                    <p className="text-xs text-gray-400">Tap square to stop</p>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Tap to record</p>
-                    <p className="text-xs text-gray-400">Speak your thoughts freely</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center w-full max-w-md">
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-purple-100 dark:border-purple-700">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-white" />
-                </div>
-                <p className="text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">Voice note captured</p>
-                <audio src={audioURL} controls className="w-full mt-3 rounded-lg" />
-                <button onClick={deleteRecording} className="mt-4 px-4 py-2 text-red-500 text-sm hover:bg-red-50 rounded-full transition-colors inline-flex items-center gap-1">
-                  <Trash2 className="w-3 h-3" />
-                  Delete & re-record
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
 
         <div className="text-center py-4">
           <p className="text-xs text-gray-400 italic">"Your thoughts are safe here. No judgment, just reflection."</p>

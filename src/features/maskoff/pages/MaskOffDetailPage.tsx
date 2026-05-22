@@ -1,30 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2, ShieldCheck } from 'lucide-react';
-import { getMaskOffTheme, MASK_OFF_ENTRIES_KEY, MASK_OFF_PIN_KEY, maskOffMoods, type MaskOffEntry, type MaskOffTheme } from '../data/maskOffConfig';
+import { ArrowLeft, Edit, Eye, EyeOff, Trash2, ShieldCheck } from 'lucide-react';
+import {
+  getMaskOffTheme,
+  MASK_OFF_ENTRIES_KEY,
+  MASK_OFF_PIN_KEY,
+  MASK_OFF_THEME_KEY,
+  maskOffMoods,
+  type MaskOffEntry,
+} from '../data/maskOffConfig';
 
 export function MaskOffDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  const [entry, setEntry] = useState<MaskOffEntry | null>(null);
-  const themeId = (location.state as any)?.themeId || localStorage.getItem('maskoff-theme');
-  const [theme, setTheme] = useState<MaskOffTheme>(getMaskOffTheme(themeId));
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [pin, setPin] = useState('');
-  const [savedPin, setSavedPin] = useState<string | null>(null);
-
-  useEffect(() => {
+  const locationState = location.state as { themeId?: string } | null;
+  const entry = useMemo<MaskOffEntry | null>(() => {
     const storedEntries = localStorage.getItem(MASK_OFF_ENTRIES_KEY);
-    if (storedEntries) {
-      const entries = JSON.parse(storedEntries) as MaskOffEntry[];
-      const found = entries.find((e) => e.id === id);
-      setEntry(found || null);
-    }
-    setSavedPin(localStorage.getItem(MASK_OFF_PIN_KEY));
-    setIsLoading(false);
+    if (!storedEntries) return null;
+
+    const entries = JSON.parse(storedEntries) as MaskOffEntry[];
+    return entries.find((e) => e.id === id) ?? null;
   }, [id]);
+  const themeId = locationState?.themeId || localStorage.getItem(MASK_OFF_THEME_KEY);
+  const theme = getMaskOffTheme(themeId);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isContentRevealed, setIsContentRevealed] = useState(false);
+  const [pin, setPin] = useState('');
+  const [savedPin] = useState<string | null>(() => localStorage.getItem(MASK_OFF_PIN_KEY));
 
   const handleUnlock = () => {
     if (pin === savedPin) {
@@ -35,7 +38,7 @@ export function MaskOffDetailPage() {
     alert('Wrong PIN');
   };
 
-  if (isLoading || !entry) {
+  if (!entry) {
     return (
       <div className={`min-h-screen ${theme.pageClass}`}>
         <div className="flex items-center justify-center min-h-screen">
@@ -49,7 +52,7 @@ export function MaskOffDetailPage() {
     return (
       <div className={`min-h-screen ${theme.pageClass}`}>
         <div className="relative z-10 flex min-h-screen items-center justify-center p-6">
-          <div className={`w-full max-w-sm rounded-3xl border p-6 text-center ${theme.panelClass}`}>
+          <div className={`smooth-card w-full max-w-sm rounded-3xl border p-6 text-center ${theme.panelClass}`}>
             <ShieldCheck className="mx-auto mb-4 h-14 w-14 opacity-80" aria-hidden="true" />
             <h1 className="font-cute-display text-2xl">Unlock Entry</h1>
             <p className={`mt-2 text-sm ${theme.mutedTextClass}`}>
@@ -62,7 +65,7 @@ export function MaskOffDetailPage() {
               value={pin}
               onChange={(event) => setPin(event.target.value)}
               placeholder="Enter PIN"
-              className="mt-6 w-full rounded-2xl border border-white/40 bg-white/70 p-3 text-center text-2xl tracking-[0.35em] text-slate-950 outline-none focus:ring-2 focus:ring-current"
+              className="smooth-field mt-6 w-full rounded-2xl border border-white/40 bg-white/70 p-3 text-center text-2xl tracking-[0.35em] text-slate-950 outline-none focus:ring-2 focus:ring-current"
               aria-label="Mask-Off PIN"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -73,14 +76,14 @@ export function MaskOffDetailPage() {
             <button
               type="button"
               onClick={handleUnlock}
-              className={`mt-4 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${theme.accentClass}`}
+              className={`smooth-press mt-4 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${theme.accentClass}`}
             >
               Unlock
             </button>
             <button
               type="button"
               onClick={() => navigate('/')}
-              className={`mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${theme.panelClass} ${theme.textClass}`}
+              className={`smooth-press mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${theme.panelClass} ${theme.textClass}`}
             >
               Back to Home
             </button>
@@ -91,6 +94,7 @@ export function MaskOffDetailPage() {
   }
 
   const mood = maskOffMoods.find((item) => item.id === entry.mood);
+  const shouldBlurContent = Boolean(entry.blurContent && !isContentRevealed);
   const formattedDate = new Date(entry.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -124,7 +128,7 @@ export function MaskOffDetailPage() {
             <button
               type="button"
               onClick={() => navigate('/maskoff')}
-              className={`rounded-full border p-2 transition hover:scale-[1.05] ${theme.panelClass}`}
+              className={`smooth-press rounded-full border p-2 transition hover:scale-[1.05] ${theme.panelClass}`}
               aria-label="Go back"
             >
               <ArrowLeft className="h-5 w-5" aria-hidden="true" />
@@ -134,7 +138,7 @@ export function MaskOffDetailPage() {
               <button
                 type="button"
                 onClick={handleEdit}
-                className={`rounded-full border p-2 transition hover:scale-[1.05] ${theme.panelClass}`}
+                className={`smooth-press rounded-full border p-2 transition hover:scale-[1.05] ${theme.panelClass}`}
                 aria-label="Edit entry"
               >
                 <Edit className="h-5 w-5" aria-hidden="true" />
@@ -142,7 +146,7 @@ export function MaskOffDetailPage() {
               <button
                 type="button"
                 onClick={handleDelete}
-                className={`rounded-full border p-2 transition hover:scale-[1.05] ${theme.panelClass}`}
+                className={`smooth-press rounded-full border p-2 transition hover:scale-[1.05] ${theme.panelClass}`}
                 aria-label="Delete entry"
               >
                 <Trash2 className="h-5 w-5" aria-hidden="true" />
@@ -172,14 +176,41 @@ export function MaskOffDetailPage() {
           </div>
 
           {/* Content */}
-          <section className={`rounded-2xl border p-6 ${theme.panelClass}`}>
-            <h3 className="font-cute-display text-lg mb-4">Your thoughts</h3>
-            <p className={`whitespace-pre-wrap leading-relaxed ${theme.textClass}`}>{entry.content}</p>
+          <section className={`smooth-card rounded-2xl border p-6 ${theme.panelClass}`}>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h3 className="font-cute-display text-lg">Your thoughts</h3>
+              {entry.blurContent && (
+                <button
+                  type="button"
+                  onClick={() => setIsContentRevealed((value) => !value)}
+                  className={`smooth-press inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition hover:scale-[1.02] ${theme.borderClass}`}
+                >
+                  {isContentRevealed ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                  {isContentRevealed ? 'Hide again' : 'Reveal'}
+                </button>
+              )}
+            </div>
+            {shouldBlurContent ? (
+              <div className="relative overflow-hidden rounded-xl border border-white/30">
+                <p className={`maskoff-entry-blur whitespace-pre-wrap p-4 leading-relaxed ${theme.textClass}`}>
+                  {entry.content || 'No written content yet.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsContentRevealed(true)}
+                  className="smooth-press absolute inset-0 flex items-center justify-center bg-slate-950/35 p-4 text-center text-sm font-semibold text-white backdrop-blur-sm"
+                >
+                  Blurred by choice. Tap to reveal when you feel ready.
+                </button>
+              </div>
+            ) : (
+              <p className={`whitespace-pre-wrap leading-relaxed ${theme.textClass}`}>{entry.content || 'No written content yet.'}</p>
+            )}
           </section>
 
           {/* Summary */}
           {entry.summary && (
-            <section className={`rounded-2xl border p-6 ${theme.panelClass}`}>
+            <section className={`smooth-card rounded-2xl border p-6 ${theme.panelClass}`}>
               <h3 className="font-cute-display text-lg mb-4">Summary</h3>
               <p className={`${theme.textClass}`}>{entry.summary}</p>
             </section>
@@ -188,13 +219,13 @@ export function MaskOffDetailPage() {
           {/* Cognitive Distortion & Reframe */}
           <div className="grid gap-6 sm:grid-cols-2">
             {entry.cognitiveDistortion && (
-              <section className={`rounded-2xl border p-6 ${theme.panelClass}`}>
+              <section className={`smooth-card rounded-2xl border p-6 ${theme.panelClass}`}>
                 <h3 className="font-cute-display text-lg mb-4">Cognitive Distortion</h3>
                 <p className={`${theme.textClass}`}>{entry.cognitiveDistortion}</p>
               </section>
             )}
             {entry.reframe && (
-              <section className={`rounded-2xl border p-6 ${theme.panelClass}`}>
+              <section className={`smooth-card rounded-2xl border p-6 ${theme.panelClass}`}>
                 <h3 className="font-cute-display text-lg mb-4">Reframe</h3>
                 <p className={`${theme.textClass}`}>{entry.reframe}</p>
               </section>

@@ -11,7 +11,7 @@ interface MoodTrackerProps {
 
 export function MoodTracker({ selectedMood, intensity, onMoodChange, onIntensityChange, theme }: MoodTrackerProps) {
   return (
-    <section className={`rounded-2xl border p-4 ${theme.panelClass}`}>
+    <section className={`smooth-card rounded-2xl border p-4 ${theme.panelClass}`}>
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold">Feelings & mood</h2>
@@ -35,7 +35,7 @@ export function MoodTracker({ selectedMood, intensity, onMoodChange, onIntensity
             animate={{ scale: isSelected ? 1.04 : 1 }}
             transition={{ type: 'spring', stiffness: 420, damping: 22 }}
             onClick={() => onMoodChange(mood.id)}
-            className={`rounded-xl border px-2 py-3 text-center transition ${
+            className={`smooth-press rounded-xl border px-2 py-3 text-center transition ${
               isSelected ? `${theme.accentClass} border-transparent` : `${theme.borderClass} hover:bg-white/20`
             }`}
             style={{ opacity: isSelected ? 1 : 0.72 + intensity * 0.025 }}
@@ -64,7 +64,7 @@ export function MoodTracker({ selectedMood, intensity, onMoodChange, onIntensity
         max="10"
         value={intensity}
         onChange={(event) => onIntensityChange(Number(event.target.value))}
-        className="mt-3 w-full accent-current"
+        className="smooth-field mt-3 w-full accent-current"
       />
       <div className={`mt-1 flex justify-between text-xs ${theme.mutedTextClass}`} aria-hidden="true">
         <span>Low</span>

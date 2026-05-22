@@ -8,7 +8,7 @@ interface ThemePickerProps {
 
 export function ThemePicker({ selectedTheme, onChange }: ThemePickerProps) {
   return (
-    <section className={`rounded-2xl border p-4 ${selectedTheme.panelClass}`}>
+    <section className={`smooth-card rounded-2xl border p-4 ${selectedTheme.panelClass}`}>
       <div className="mb-3 flex items-center gap-2">
         <Palette className="h-4 w-4" aria-hidden="true" />
         <h2 className="text-sm font-semibold">Background theme</h2>
@@ -21,7 +21,7 @@ export function ThemePicker({ selectedTheme, onChange }: ThemePickerProps) {
             role="radio"
             aria-checked={selectedTheme.id === theme.id}
             onClick={() => onChange(theme)}
-            className={`rounded-xl border p-3 text-left transition ${
+            className={`smooth-card rounded-xl border p-3 text-left transition ${
               selectedTheme.id === theme.id ? 'border-current ring-2 ring-current/30' : selectedTheme.borderClass
             }`}
           >
