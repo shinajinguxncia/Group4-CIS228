@@ -34,6 +34,7 @@ export interface MaskOffEntry {
 }
 
 export const MASK_OFF_THEME_KEY = 'maskoff_theme';
+export const MASK_OFF_THEME_CHANGE_EVENT = 'maskoff-theme-change';
 export const MASK_OFF_ENTRIES_KEY = 'maskoff_entries';
 export const MASK_OFF_PIN_KEY = 'maskoff_pin';
 

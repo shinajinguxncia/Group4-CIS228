@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, EyeOff, Home, Mic, Moon, Square, Sun, Trash2 } from 'lucide-react';
+import { ArrowLeft, EyeOff, Mic, Moon, Square, Sun, Trash2 } from 'lucide-react';
 import { useTheme } from '../../../context/theme';
 import { cognitiveDistortions } from '../../../types/journal';
 import { ComfortCompanion } from '../components/ComfortCompanion';
@@ -139,15 +139,7 @@ export function NewMaskOffPage() {
     <div className={`min-h-screen ${theme.pageClass}`}>
       <div className={`relative z-10 transition duration-300 ${isHidden ? 'maskoff-private-blur' : ''}`}>
         <header className="sticky top-0 z-20 px-4 py-4 backdrop-blur-xl">
-          <div className="mx-auto mb-3 flex max-w-3xl items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className={`smooth-press inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${theme.panelClass} ${theme.textClass}`}
-            >
-              <Home className="h-4 w-4" aria-hidden="true" />
-              Home
-            </button>
+          <div className="mx-auto mb-3 flex max-w-3xl items-center justify-end gap-2">
             <button
               type="button"
               role="switch"

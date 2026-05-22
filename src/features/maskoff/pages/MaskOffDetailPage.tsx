@@ -80,13 +80,6 @@ export function MaskOffDetailPage() {
             >
               Unlock
             </button>
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className={`smooth-press mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${theme.panelClass} ${theme.textClass}`}
-            >
-              Back to Home
-            </button>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FileText, Home, Lock, Moon, Plus, Search, ShieldCheck, Sun } from 'lucide-react';
+import { FileText, Lock, Moon, Plus, Search, ShieldCheck, Sun } from 'lucide-react';
 import { useTheme } from '../../../context/theme';
 import { ComfortCompanion } from '../components/ComfortCompanion';
 import { FloatingThemeMenu } from '../components/FloatingThemeMenu';
@@ -11,6 +11,7 @@ import {
   getMaskOffTheme,
   MASK_OFF_ENTRIES_KEY,
   MASK_OFF_PIN_KEY,
+  MASK_OFF_THEME_CHANGE_EVENT,
   MASK_OFF_THEME_KEY,
   maskOffMoods,
   type MaskOffEntry,
@@ -71,6 +72,7 @@ export function MaskOffPage() {
   const handleThemeChange = (theme: MaskOffTheme) => {
     setSelectedTheme(theme);
     localStorage.setItem(MASK_OFF_THEME_KEY, theme.id);
+    window.dispatchEvent(new CustomEvent(MASK_OFF_THEME_CHANGE_EVENT, { detail: theme.id }));
     setIsThemeMenuOpen(false);
   };
 
@@ -101,13 +103,6 @@ export function MaskOffPage() {
             >
               {savedPin ? 'Unlock' : 'Set PIN'}
             </button>
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className={`smooth-press mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
-            >
-              Back to Home
-            </button>
             <div className="mt-5">
               <PrivacyBadge theme={selectedTheme} />
             </div>
@@ -120,16 +115,7 @@ export function MaskOffPage() {
   return (
     <div className={`min-h-screen ${selectedTheme.pageClass}`}>
       <div className={`relative z-10 transition duration-300 ${isHidden ? 'maskoff-private-blur' : ''}`}>
-        <nav className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 pt-5">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className={`smooth-press inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition hover:scale-[1.02] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
-          >
-            <Home className="h-4 w-4" aria-hidden="true" />
-            Home
-          </button>
-
+        <nav className="mx-auto flex max-w-3xl flex-wrap items-center justify-end gap-3 px-4 pt-5">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
