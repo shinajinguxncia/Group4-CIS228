@@ -243,7 +243,7 @@ export function MaskOffPage() {
         <button
           type="button"
           onClick={() => setIsHidden(false)}
-          className="fixed inset-0 z-30 flex items-center justify-center bg-slate-950/80 p-6 text-center text-white backdrop-blur-xl"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 p-6 text-center text-white backdrop-blur-xl"
         >
           <span className="rounded-3xl border border-white/15 bg-white/10 px-6 py-5 text-sm font-medium">
             Privacy screen is on. Tap anywhere to reveal.

@@ -1,13 +1,48 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, CalendarDays, LockKeyhole, Mic, Plus, Search, Sparkles } from 'lucide-react';
+import { BookOpen, CalendarDays, Clock, LockKeyhole, Mic, Plus, Quote, Search, Sparkles } from 'lucide-react';
 import { loadUnifiedEntries, type UnifiedEntry } from '../data/entries';
+
+const hourlyQuotes = [
+  'Start with one honest sentence.',
+  'Small progress is still proof that you are moving.',
+  'You can be gentle and still be serious about growth.',
+  'Write what is true now. Clarity can come later.',
+  'A calm mind is built one pause at a time.',
+  'Today does not need to be perfect to be meaningful.',
+  'Your feelings are information, not instructions.',
+  'Make space for the version of you that is trying.',
+  'One brave note can change the shape of the day.',
+  'Breathe first, then choose the next small step.',
+  'You are allowed to begin again in the middle of things.',
+  'Name the feeling, then give yourself room.',
+];
+
+function getHourlyQuote(date: Date) {
+  return hourlyQuotes[(date.getDate() + date.getHours()) % hourlyQuotes.length];
+}
 
 export function HomePage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [unifiedEntries] = useState<UnifiedEntry[]>(loadUnifiedEntries);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNow(new Date()), 30000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const todayLabel = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const timeLabel = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const hourlyQuote = getHourlyQuote(now);
 
   const filtered = unifiedEntries.filter((entry) => {
     const query = searchQuery.toLowerCase();
@@ -30,10 +65,32 @@ export function HomePage() {
   return (
     <div className="font-maskoff px-4 pb-6">
       <section className="pt-6">
-        <h1 className="font-cute-display text-4xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          MabuhAi
-        </h1>
-        <p className="mt-1 text-sm text-gray-400 dark:text-slate-400">Your thoughts are safe here</p>
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <h1 className="font-cute-display bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-4xl text-transparent">
+              MabuhAi
+            </h1>
+            <p className="mt-1 text-sm text-gray-400 dark:text-slate-400">Your thoughts are safe here</p>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-purple-500 dark:text-purple-300">
+            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            Today
+          </p>
+          <h2 className="font-cute-display mt-2 text-3xl leading-tight text-gray-950 dark:text-slate-50">
+            {todayLabel}
+          </h2>
+          <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-2 text-base font-bold text-sky-700 shadow-sm dark:bg-sky-950/40 dark:text-sky-200">
+            <Clock className="h-4 w-4" aria-hidden="true" />
+            {timeLabel}
+          </p>
+          <div className="smooth-card mt-4 flex gap-3 rounded-3xl border border-purple-100 bg-gradient-to-r from-purple-50 via-pink-50 to-amber-50 p-4 text-gray-800 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 dark:text-slate-100">
+            <Quote className="mt-0.5 h-4 w-4 shrink-0 text-purple-500" aria-hidden="true" />
+            <p className="text-sm font-semibold leading-6">{hourlyQuote}</p>
+          </div>
+        </div>
       </section>
 
       <section className="mt-5 grid grid-cols-3 gap-3">
@@ -41,8 +98,6 @@ export function HomePage() {
         <DashboardStat label="This week" value={thisWeekCount} />
         <DashboardStat label="Private" value={privateCount} />
       </section>
-
-      <CalendarShortcut entries={unifiedEntries} onClick={() => navigate('/mood-calendar')} />
 
       <motion.button
         type="button"
@@ -128,44 +183,6 @@ export function HomePage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function CalendarShortcut({ entries, onClick }: { entries: UnifiedEntry[]; onClick: () => void }) {
-  const recentEmojis = Array.from(new Set(entries.map((entry) => entry.moodEmoji).filter(Boolean))).slice(0, 4);
-
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      whileHover={{ y: -2, scale: 1.01 }}
-      whileTap={{ scale: 0.985 }}
-      transition={{ type: 'spring', stiffness: 420, damping: 28 }}
-      className="smooth-card mt-5 flex w-full items-center justify-between gap-3 rounded-2xl border border-purple-100 bg-white/90 p-3 text-left shadow-sm dark:border-slate-700 dark:bg-slate-800/90"
-    >
-      <span className="flex min-w-0 items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 dark:bg-purple-900/70 dark:text-purple-200">
-          <CalendarDays className="h-5 w-5" aria-hidden="true" />
-        </span>
-        <span className="min-w-0">
-          <span className="block text-sm font-semibold text-gray-800 dark:text-slate-100">Mood calendar</span>
-          <span className="block truncate text-xs text-gray-500 dark:text-slate-400">Open monthly mood tracker</span>
-        </span>
-      </span>
-      <span className="flex shrink-0 items-center gap-1">
-        {recentEmojis.length > 0 ? (
-          recentEmojis.map((emoji) => (
-            <span key={emoji} className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-50 text-sm dark:bg-purple-950/60">
-              {emoji}
-            </span>
-          ))
-        ) : (
-          <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-400 dark:bg-slate-900 dark:text-slate-500">
-            No moods
-          </span>
-        )}
-      </span>
-    </motion.button>
   );
 }
 
