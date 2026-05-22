@@ -4,6 +4,7 @@ import { HomePage } from './features/journal/pages/HomePage';
 import { NewEntryPage } from './features/journal/pages/NewEntryPage';
 import { EntryDetailPage } from './features/journal/pages/EntryDetailPage';
 import { MaskOffPage } from './features/maskoff/pages/MaskOffPage';
+import { MaskOffDetailPage } from './features/maskoff/pages/MaskOffDetailPage';
 import { NewMaskOffPage } from './features/maskoff/pages/NewMaskOffPage';
 
 function App() {
@@ -28,6 +29,11 @@ function App() {
         <Route path="/maskoff" element={
           <Layout>
             <MaskOffPage />
+          </Layout>
+        } />
+        <Route path="/maskoff-detail/:id" element={
+          <Layout>
+            <MaskOffDetailPage />
           </Layout>
         } />
         <Route path="/new-maskoff" element={

@@ -92,7 +92,7 @@ export function MaskOffPage() {
             <ShieldCheck className="mx-auto mb-4 h-14 w-14 opacity-80" aria-hidden="true" />
             <h1 className="font-cute-display text-2xl">{savedPin ? 'Unlock Mask-Off' : 'Create Your PIN'}</h1>
             <p className={`mt-2 text-sm ${selectedTheme.mutedTextClass}`}>
-              This is your private room for the things you do not want to perform.
+              This is your private room for the things you do not want others to see.
             </p>
             <input
               type="password"
@@ -110,6 +110,13 @@ export function MaskOffPage() {
               className={`mt-4 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.accentClass}`}
             >
               {savedPin ? 'Unlock' : 'Set PIN'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className={`mt-3 w-full rounded-2xl px-4 py-3 font-semibold transition hover:scale-[1.01] ${selectedTheme.panelClass} ${selectedTheme.textClass}`}
+            >
+              Back to Home
             </button>
             <div className="mt-5">
               <PrivacyBadge theme={selectedTheme} />
@@ -210,7 +217,12 @@ export function MaskOffPage() {
                 {filteredEntries.map((entry) => {
                   const mood = maskOffMoods.find((item) => item.id === entry.mood);
                   return (
-                    <article key={entry.id} className={`rounded-xl border p-3 ${selectedTheme.borderClass}`}>
+                    <button
+                      key={entry.id}
+                      type="button"
+                      onClick={() => navigate(`/maskoff-detail/${entry.id}`, { state: { themeId: selectedTheme.id } })}
+                      className={`w-full text-left rounded-xl border p-3 transition hover:scale-[1.01] ${selectedTheme.borderClass}`}
+                    >
                       <div className="flex items-center justify-between gap-3">
                         <h3 className="font-cute-display text-lg">{entry.title || 'Untitled truth'}</h3>
                         <span className={`text-xs ${selectedTheme.mutedTextClass}`}>
@@ -226,7 +238,7 @@ export function MaskOffPage() {
                         {entry.summary && <span className={`rounded-full border px-2 py-1 ${selectedTheme.borderClass}`}>{entry.summary}</span>}
                         {entry.cognitiveDistortion && <span className={`rounded-full border px-2 py-1 ${selectedTheme.borderClass}`}>{entry.cognitiveDistortion}</span>}
                       </div>
-                    </article>
+                    </button>
                   );
                 })}
               </div>
