@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { BottomNav } from './BottomNav';
 import { useTheme } from '../context/theme';
 
 interface LayoutProps {
@@ -39,7 +38,6 @@ export function Layout({ children }: LayoutProps) {
       </header>}
 
       {children}
-      <BottomNav />
     </div>
   );
 }

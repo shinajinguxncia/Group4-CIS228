@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BottomNav } from './components/BottomNav';
 import { Layout } from './components/Layout';
 import { HomePage } from './features/journal/pages/HomePage';
 import { MoodCalendarPage } from './features/journal/pages/MoodCalendarPage';
@@ -13,6 +14,7 @@ function App() {
   return (
     <BrowserRouter>
       <AnimatedRoutes />
+      <BottomNav />
     </BrowserRouter>
   );
 }
